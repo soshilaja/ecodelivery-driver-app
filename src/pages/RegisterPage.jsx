@@ -3,11 +3,16 @@ import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, storage, firestore } from "../services/firebase";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
+    password: "",
+    confirmPassword: "",
     phoneNumber: "",
     vehicleType: "",
     driverLicense: null,
@@ -16,8 +21,29 @@ const RegisterPage = () => {
 
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const vehicleTypes = ["Bike", "E-bike", "E-scooter", "Electric Vehicle (EV)"];
+  const vehicleTypes = ["Bike", "E-bike", "Electric Vehicle (EV)"];
+
+  const validatePassword = (password) => {
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const isLongEnough = password.length >= 12;
+
+    const errors = [];
+    if (!hasUpperCase) errors.push("uppercase letter");
+    if (!hasLowerCase) errors.push("lowercase letter");
+    if (!hasNumber) errors.push("number");
+    if (!hasSpecialChar) errors.push("special character");
+    if (!isLongEnough) errors.push("minimum length of 12 characters");
+
+    return {
+      isValid: errors.length === 0,
+      errors: errors,
+    };
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +51,15 @@ const RegisterPage = () => {
       ...prev,
       [name]: value,
     }));
+
+    // Clear password-related errors when user types
+    if (name === "password" || name === "confirmPassword") {
+      setErrors((prev) => ({
+        ...prev,
+        password: undefined,
+        confirmPassword: undefined,
+      }));
+    }
   };
 
   const handleFileUpload = (e, documentType) => {
@@ -40,6 +75,19 @@ const RegisterPage = () => {
 
     if (!formData.fullName) newErrors.fullName = "Full Name is required";
     if (!formData.email) newErrors.email = "Email is required";
+
+    // Password validation
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      newErrors.password = `Password must include: ${passwordValidation.errors.join(
+        ", "
+      )}`;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
     if (!formData.phoneNumber)
       newErrors.phoneNumber = "Phone Number is required";
     if (!formData.vehicleType)
@@ -72,15 +120,13 @@ const RegisterPage = () => {
     setIsLoading(true);
 
     try {
-      // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
-        "TempPassword123!" // You'd want to implement a more secure password generation/reset
+        formData.password
       );
       const user = userCredential.user;
 
-      // Upload documents
       const driverLicenseUrl = await uploadDocument(
         formData.driverLicense,
         user.uid,
@@ -92,7 +138,6 @@ const RegisterPage = () => {
         "insurance-proof"
       );
 
-      // Save driver profile to Firestore
       await setDoc(doc(firestore, "drivers", user.uid), {
         fullName: formData.fullName,
         email: formData.email,
@@ -100,27 +145,29 @@ const RegisterPage = () => {
         vehicleType: formData.vehicleType,
         driverLicenseUrl,
         insuranceProofUrl,
-        greenScore: 0, // Initial green score
-        status: "Offline", // Initial status
+        greenScore: 0,
+        status: "Offline",
         registeredAt: new Date(),
       });
 
-      // Reset form and show success message
       setFormData({
         fullName: "",
         email: "",
+        password: "",
+        confirmPassword: "",
         phoneNumber: "",
         vehicleType: "",
         driverLicense: null,
         insuranceProof: null,
       });
 
-      alert(
+      toast.success(
         "Registration Successful! Please check your email to complete setup."
       );
+      navigate("/dashboard");
     } catch (error) {
       console.error("Registration Error:", error);
-      alert(`Registration Failed: ${error.message}`);
+      toast.error(`Registration Failed: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -130,7 +177,7 @@ const RegisterPage = () => {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
         <h2 className="text-2xl font-bold mb-6 text-center text-green-700">
-          EcoWheels Driver Registration
+          EcoDelivery Driver Registration
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -169,6 +216,50 @@ const RegisterPage = () => {
             />
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            )}
+          </div>
+
+          {/* Password Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              className={`mt-1 block w-full rounded-md border ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              } shadow-sm py-2 px-3`}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
+            <p className="text-gray-500 text-xs mt-1">
+              Password must be at least 12 characters long and contain
+              uppercase, lowercase, number, and special character.
+            </p>
+          </div>
+
+          {/* Confirm Password Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+              className={`mt-1 block w-full rounded-md border ${
+                errors.confirmPassword ? "border-red-500" : "border-gray-300"
+              } shadow-sm py-2 px-3`}
+            />
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.confirmPassword}
+              </p>
             )}
           </div>
 

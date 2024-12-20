@@ -5,29 +5,45 @@ import { doc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { firestore, storage } from "../services/firebase";
 import toast from "react-hot-toast";
+import Address from "../components/Address";
 
 const ProfilePage = () => {
   const { user, driverProfile } = useAuth();
   const navigate = useNavigate();
+  console.log(driverProfile)
 
   const [profileData, setProfileData] = useState({
     fullName: driverProfile?.fullName || "",
     phoneNumber: driverProfile?.phoneNumber || "",
     vehicleType: driverProfile?.vehicleType || "",
-    address: driverProfile?.address || "",
+    // address: driverProfile?.address || "",
   });
 
-  const [documents, setDocuments] = useState({
-    driverLicense: null,
-    insurance: null,
-  });
+  const [address, setAddress] = useState(
+    
+    {
+      address1: driverProfile?.driverAddress?.address1 || "",
+      city: driverProfile?.driverAddress?.city || "",
+      state: driverProfile?.driverAddress?.state || "",
+      postal: driverProfile?.driverAddress?.postal || "",
+      country: driverProfile?.driverAddress?.country || "",
+    }
+  );
+  const [address2, setAddress2] = useState(
+    driverProfile?.driverAddress?.address2 || ""
+  );
 
-  const documentRefs = {
-    driverLicense: useRef(null),
-    insurance: useRef(null),
-  };
+  // const [documents, setDocuments] = useState({
+  //   driverLicense: null,
+  //   insurance: null,
+  // });
 
-  const vehicleTypes = ["Bike", "E-bike", "E-scooter", "Electric Vehicle (EV)"];
+  // const documentRefs = {
+  //   driverLicense: useRef(null),
+  //   insurance: useRef(null),
+  // };
+
+  const vehicleTypes = ["Bike", "E-bike", "Electric Vehicle (EV)"];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,35 +53,35 @@ const ProfilePage = () => {
     }));
   };
 
-  const handleFileUpload = async (documentType) => {
-    const file = documentRefs[documentType].current.files[0];
-    if (!file) {
-      toast.error("Please select a file");
-      return;
-    }
+  // const handleFileUpload = async (documentType) => {
+  //   const file = documentRefs[documentType].current.files[0];
+  //   if (!file) {
+  //     toast.error("Please select a file");
+  //     return;
+  //   }
 
-    try {
-      const storageRef = ref(
-        storage,
-        `driver-documents/${user.uid}/${documentType}-${Date.now()}`
-      );
+  //   try {
+  //     const storageRef = ref(
+  //       storage,
+  //       `driver-documents/${user.uid}/${documentType}-${Date.now()}`
+  //     );
 
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
+  //     const snapshot = await uploadBytes(storageRef, file);
+  //     const downloadURL = await getDownloadURL(snapshot.ref);
 
-      setDocuments((prev) => ({
-        ...prev,
-        [documentType]: {
-          name: file.name,
-          url: downloadURL,
-        },
-      }));
+  //     setDocuments((prev) => ({
+  //       ...prev,
+  //       [documentType]: {
+  //         name: file.name,
+  //         url: downloadURL,
+  //       },
+  //     }));
 
-      toast.success(`${documentType} uploaded successfully`);
-    } catch (error) {
-      toast.error(`Upload failed: ${error.message}`);
-    }
-  };
+  //     toast.success(`${documentType} uploaded successfully`);
+  //   } catch (error) {
+  //     toast.error(`Upload failed: ${error.message}`);
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,26 +90,35 @@ const ProfilePage = () => {
     if (
       !profileData.fullName ||
       !profileData.phoneNumber ||
-      !profileData.vehicleType
+      !profileData.vehicleType ||
+      !address
     ) {
       toast.error("Please fill in all required fields");
       return;
     }
 
-    if (!documents.driverLicense || !documents.insurance) {
-      toast.error("Please upload all required documents");
-      return;
-    }
+    // if (!documents.driverLicense || !documents.insurance) {
+    //   toast.error("Please upload all required documents");
+    //   return;
+    // }
+
+    const driverAddress = {
+      address1: address.address1,
+      address2: address2,
+      city: address.city,
+      province: address.state,
+      postalCode: address.postal,
+      country: address.country,
+    };
 
     try {
       const driverDocRef = doc(firestore, "drivers", user.uid);
-
       await updateDoc(driverDocRef, {
-        ...profileData,
-        documents: {
-          driverLicense: documents.driverLicense,
-          insurance: documents.insurance,
-        },
+        ...profileData, driverAddress,
+        // documents: {
+        //   driverLicense: documents.driverLicense,
+        //   insurance: documents.insurance,
+        // },
         profileCompletionStatus: "complete",
         updatedAt: new Date(),
       });
@@ -149,6 +174,14 @@ const ProfilePage = () => {
                   />
                 </div>
 
+                <Address
+                  address={address}
+                  setAddress={setAddress}
+                  address2={address2}
+                  setAddress2={setAddress2}
+                  // onChange={handleInputChange}
+                />
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Vehicle Type
@@ -169,7 +202,7 @@ const ProfilePage = () => {
                   </select>
                 </div>
 
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Driver&#39;s License
                   </label>
@@ -191,9 +224,9 @@ const ProfilePage = () => {
                         : "Upload License"}
                     </button>
                   </div>
-                </div>
+                </div> */}
 
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Insurance Document
                   </label>
@@ -215,7 +248,7 @@ const ProfilePage = () => {
                         : "Upload Insurance"}
                     </button>
                   </div>
-                </div>
+                </div> */}
 
                 <div>
                   <button
