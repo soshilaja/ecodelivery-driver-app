@@ -1,5 +1,4 @@
 import GoogleMapsAutocomplete from "./GoogleMapsAutocomplete";
-import { firestore, storage } from "../services/firebase";
 import { useAuth } from "../contexts/AuthContext";
 
 
@@ -27,7 +26,7 @@ const Address = ({
     }
   };
 
-  const { user, driverProfile } = useAuth();
+  const { driverProfile } = useAuth();
 
 
   return (
@@ -39,13 +38,13 @@ const Address = ({
         <GoogleMapsAutocomplete
           onPlaceSelected={handlePlaceSelected}
           placeholder={
-            driverProfile.driverAddress.address1 +
+            driverProfile?.driverAddress?.address1 +
             ", " +
-            driverProfile.driverAddress.city +
+            driverProfile?.driverAddress?.city +
             ", " +
-            driverProfile.driverAddress.province +
+            driverProfile?.driverAddress?.province +
             ", " +
-            driverProfile.driverAddress.country
+            driverProfile?.driverAddress?.country
           }
           id="driver-address"
           name="driver-address"

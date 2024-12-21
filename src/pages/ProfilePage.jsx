@@ -10,6 +10,7 @@ import Address from "../components/Address";
 
 const ProfilePage = () => {
   const { user, driverProfile } = useAuth();
+
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +47,7 @@ const ProfilePage = () => {
     insurance: useRef(null),
   };
 
-  const vehicleTypes = ["Bike", "E-bike", "Electric Vehicle (EV)"];
+  const vehicleTypes = ["bike", "electric-bike", "electric-vehicle"];
 
     // Function to fetch updated driver data
     const fetchDriverData = async () => {
@@ -80,9 +81,6 @@ const ProfilePage = () => {
             driverLicense: data.documents?.driverLicense || null,
             insurance: data.documents?.insurance || null,
           });
-
-          // Update context
-          setDriverProfile(data);
         }
       } catch (error) {
         toast.error("Failed to fetch profile data");
@@ -215,8 +213,8 @@ const ProfilePage = () => {
         updatedAt: new Date(),
       });
 
-            // Fetch updated data
-            await fetchDriverData();
+      // Fetch updated data
+     await fetchDriverData();
 
       toast.success("Profile updated successfully!");
       navigate("/dashboard");

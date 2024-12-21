@@ -16,6 +16,23 @@ import {
 } from "@heroicons/react/24/solid";
 
 
+// Function to format address for Google Maps
+  const formatAddress = (addressData) => {
+    if (!addressData) return "";
+
+    const parts = [
+      addressData.address1,
+      addressData.address2,
+      addressData.city,
+      addressData.province,
+      addressData.postalCode,
+      addressData.country,
+    ].filter(Boolean);
+
+    return parts.join(", ");
+  };
+
+
 const handleOrderAction = async (order, action, user) => {
   try {
     const orderRef = doc(firestore, "orders", order.id);
@@ -136,29 +153,29 @@ export const OrderCard = ({ order = {}, type = "" }) => {
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-lg font-bold text-gray-800">
-            Order #{order.id.slice(-6)}
+            Order #{order.orderId.slice(-6)}
           </h3>
           <div className="flex items-center space-x-2 mt-2">
-            <MapPinIcon className="h-5 w-5 text-gray-500" />
-            <span>{order.pickupAddress}</span>
+            <MapPinIcon className="h-5 w-5 text-yellow-500" />
+            <span>{formatAddress(order.pickupAddress)}</span>
           </div>
           <div className="flex items-center space-x-2 mt-1">
-            <MapPinIcon className="h-5 w-5 text-gray-500" />
-            <span>{order.dropoffAddress}</span>
+            <MapPinIcon className="h-5 w-5 text-red-500" />
+            <span>{formatAddress(order.deliveryAddress)}</span>
           </div>
           <div className="flex items-center space-x-2 mt-1">
-            <EnvelopeIcon className="h-5 w-5 text-gray-500" />
+            <EnvelopeIcon className="h-5 w-5 text-blue-500" />
             <span>
-              {order.packageType} - {order.packageWeight} kg
+              {order.shippingItem} - {order.shippingWeight} kg
             </span>
           </div>
           <div className="flex items-center space-x-2 mt-1">
             <ClockIcon className="h-5 w-5 text-gray-500" />
-            <span>{order.estimatedDeliveryTime}</span>
+            <span>{order.duration} mins</span>
           </div>
         </div>
         <div className="text-right">
-          <p className="font-bold text-green-600">${order.fee.toFixed(2)}</p>
+          <p className="font-bold text-green-600">${order.price.toFixed(2)}</p>
         </div>
       </div>
       <div className="mt-4 flex justify-between items-center">
@@ -184,12 +201,14 @@ export const OrderCard = ({ order = {}, type = "" }) => {
 OrderCard.propTypes = {
   order: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    pickupAddress: PropTypes.string.isRequired,
-    dropoffAddress: PropTypes.string.isRequired,
-    packageType: PropTypes.string.isRequired,
-    packageWeight: PropTypes.number.isRequired,
-    estimatedDeliveryTime: PropTypes.string.isRequired,
-    fee: PropTypes.number.isRequired,
+    pickupAddress: PropTypes.shape({ address1: PropTypes.string.isRequired })
+      .isRequired,
+    deliveryAddress: PropTypes.shape({ address1: PropTypes.string.isRequired })
+      .isRequired,
+    shippingItem: PropTypes.string.isRequired,
+    shippingWeight: PropTypes.string.isRequired,
+    duration: PropTypes.string.isRequired, //estimated delivery time
+    price: PropTypes.number.isRequired,
     status: PropTypes.string.isRequired,
   }).isRequired,
   type: PropTypes.oneOf(["available", "active"]).isRequired,
