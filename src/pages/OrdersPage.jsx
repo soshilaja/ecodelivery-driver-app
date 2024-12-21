@@ -4,7 +4,6 @@ import {
   query,
   where,
   onSnapshot,
-  getDocs,
 } from "firebase/firestore";
 
 import { firestore } from "../services/firebase";
@@ -24,10 +23,10 @@ const OrdersPage = () => {
 
   useEffect(() => {
     
-    // if (!user || driverProfile) return;
+    if (!user || !driverProfile) return;
     
-    // if (!driverProfile?.vehicleType) return;
-    console.log("available driver", user);
+    if (!driverProfile?.vehicleType) return;
+    
     
     // Listen for driver's active orders
     const activeOrdersQuery = query(
@@ -48,20 +47,6 @@ const OrdersPage = () => {
     );
     
     // Listen for available orders in the driver's area
-    // const availableOrdersRef = collection(firestore, "orders");
-    // const q = query(
-    //   availableOrdersRef,
-    //   where("status", "==", "pending"),
-    //   where("vehicleType", "==", driverProfile?.vehicleType)
-    // );
-    // const querySnapshot = getDocs(q);
-    // const doc = querySnapshot.docs;
-    // const data = doc.data();
-    // console.log("available order", data);
-    // console.log("available order");
-  
-
-
     const availableOrdersQuery = query(
       collection(firestore, "orders"),
       where("status", "==", "pending"),
@@ -76,7 +61,6 @@ const OrdersPage = () => {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log("available orders", orders);
         setAvailableOrders(orders);
       }
     );
@@ -86,11 +70,11 @@ const OrdersPage = () => {
       activeOrdersUnsubscribe();
       availableOrdersUnsubscribe();
     };
-  }, []);
+  }, [user, driverProfile]);
 
 
   return (
-    <div className="min-h-screen bg-gray-100 p-24">
+    <div className="min-h-screen bg-gray-100 px-6 py-20">
       <div className="container mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">
           Order Management

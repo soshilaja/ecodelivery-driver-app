@@ -72,8 +72,8 @@ const handleOrderAction = async (order, action, user) => {
         // Log earnings
         await addDoc(collection(firestore, "earnings"), {
           driverId: user.uid,
-          orderId: order.id,
-          amount: order.fee,
+          orderId: order.orderId,
+          amount: order.price,
           date: new Date(),
         });
 
