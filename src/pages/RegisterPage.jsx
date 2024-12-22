@@ -23,7 +23,7 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const vehicleTypes = ["Bike", "E-bike", "Electric Vehicle (EV)"];
+  const vehicleTypes = ["bike", "electric-bike", "electric-vehicle"];
 
   const validatePassword = (password) => {
     const hasUpperCase = /[A-Z]/.test(password);
@@ -174,7 +174,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-6 py-20">
       <div className="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
         <h2 className="text-2xl font-bold mb-6 text-center text-green-700">
           EcoDelivery Driver Registration

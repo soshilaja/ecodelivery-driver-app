@@ -37,14 +37,15 @@ const Address = ({
         </label>
         <GoogleMapsAutocomplete
           onPlaceSelected={handlePlaceSelected}
-          placeholder={
-            driverProfile?.driverAddress?.address1 +
+          placeholder={ driverProfile ?
+            (driverProfile?.driverAddress?.address1 +
             ", " +
             driverProfile?.driverAddress?.city +
             ", " +
             driverProfile?.driverAddress?.province +
             ", " +
-            driverProfile?.driverAddress?.country
+            driverProfile?.driverAddress?.country) :
+            ("Driver Address")
           }
           id="driver-address"
           name="driver-address"

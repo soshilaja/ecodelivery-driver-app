@@ -33,7 +33,7 @@ const SupportPage = () => {
         status: "pending",
       });
       toast.success("Incident reported successfully");
-      setIncidentReport({ type: "", description: "", location: "" });
+      setIncidentReport({ type: "", description: "", location: "", });
     } catch (error) {
       toast.error("Failed to report incident", error);
     }

@@ -24,7 +24,7 @@ const LoginPage = () => {
     try {
       await signIn(email, password);
       setError("Logged in successfully!");
-      navigate("/dashboard");
+      navigate("/profile");
     } catch (error) {
       setError(error.message);
     }
@@ -34,7 +34,7 @@ const LoginPage = () => {
     try {
       await googleSignIn();
       toast.success("Logged in with Google!");
-      navigate("/dashboard");
+      navigate("/profile");
     } catch (error) {
       toast.error(error.message);
     }
@@ -67,7 +67,7 @@ const LoginPage = () => {
                 <input
                   id="email"
                   type="email"
-                  required
+                  //required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
@@ -90,7 +90,7 @@ const LoginPage = () => {
                 <input
                   id="password"
                   type="password"
-                  required
+                  //required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
