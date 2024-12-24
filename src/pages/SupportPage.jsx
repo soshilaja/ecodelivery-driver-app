@@ -1,8 +1,8 @@
 import { useState } from "react";
 import {
-  ShieldExclamationIcon,
+  // ShieldExclamationIcon,
   PhoneIcon,
-  DocumentTextIcon,
+  // DocumentTextIcon,
 } from "@heroicons/react/24/solid";
 import { collection, addDoc } from "firebase/firestore";
 import { firestore } from "../services/firebase";

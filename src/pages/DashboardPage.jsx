@@ -34,7 +34,8 @@ const DashboardPage = () => {
     { month: "May", earnings: 0 },
     { month: "Jun", earnings: 0 },
   ]);
-
+  
+ 
   useEffect(() => {
     const fetchDriverStats = async () => {
       try {
@@ -132,7 +133,7 @@ const DashboardPage = () => {
             </span>
             <div
               className={`w-3 h-3 rounded-full ${
-                driverProfile?.status === "online"
+                driverProfile?.status === "Online"
                   ? "bg-green-500"
                   : "bg-red-500"
               }`}

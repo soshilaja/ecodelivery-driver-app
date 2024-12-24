@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useGoogleMapsApi } from "../hooks/useGoogleMaps"; // Import the custom hook
-
+import PropTypes from "prop-types";
 
 const GoogleMapsAutocomplete = ({
   onPlaceSelected,
@@ -89,3 +89,10 @@ const GoogleMapsAutocomplete = ({
 };
 
 export default GoogleMapsAutocomplete;
+
+
+GoogleMapsAutocomplete.propTypes = {
+  onPlaceSelected: PropTypes.func,
+  placeholder: PropTypes.string,
+  required: PropTypes.bool,
+};

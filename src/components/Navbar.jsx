@@ -1,6 +1,8 @@
 import  { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { doc, updateDoc } from "firebase/firestore";
+import { firestore } from "../services/firebase";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import toast from "react-hot-toast";
 
@@ -11,6 +13,11 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
+      const driverDocRef = doc(firestore, "drivers", user.uid)
+      await updateDoc(driverDocRef, {
+        status: "Offline",
+        lastLoggedOut: new Date(),
+      });
       await logout();
       toast.success("Logged out successfully");
       navigate("/login");

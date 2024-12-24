@@ -1,5 +1,5 @@
 import GoogleMapsAutocomplete from "./GoogleMapsAutocomplete";
-import { useAuth } from "../contexts/AuthContext";
+import PropTypes from "prop-types";
 
 
 
@@ -19,14 +19,12 @@ const Address = ({
         address1: data.address1,
         city: data.city,
         state: data.state,
-        postal: data.postcode,
+        postcode: data.postcode,
         country: data.country,
         error: "",
       }));
     }
   };
-
-  const { driverProfile } = useAuth();
 
 
   return (
@@ -37,15 +35,10 @@ const Address = ({
         </label>
         <GoogleMapsAutocomplete
           onPlaceSelected={handlePlaceSelected}
-          placeholder={ driverProfile ?
-            (driverProfile?.driverAddress?.address1 +
-            ", " +
-            driverProfile?.driverAddress?.city +
-            ", " +
-            driverProfile?.driverAddress?.province +
-            ", " +
-            driverProfile?.driverAddress?.country) :
-            ("Driver Address")
+          placeholder={
+            address
+              ? `${address?.address1}, ${address?.city}, ${address?.state}, ${address?.country}`
+              : "Driver Address"
           }
           id="driver-address"
           name="driver-address"
@@ -70,3 +63,17 @@ const Address = ({
 };
 
 export default Address;
+
+Address.propTypes = {
+  address: PropTypes.shape({
+    address1: PropTypes.string.isRequired,
+    city: PropTypes.string.isRequired,
+    state: PropTypes.string.isRequired,
+    postcode: PropTypes.string.isRequired,
+    country: PropTypes.string.isRequired,
+  }).isRequired,
+  setAddress: PropTypes.func.isRequired,
+  address2: PropTypes.string,
+  setAddress2: PropTypes.func.isRequired,
+
+}

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { doc, updateDoc} from "firebase/firestore";
+import { firestore} from "../services/firebase";
 import toast from "react-hot-toast";
 import {
   EnvelopeIcon,
@@ -19,10 +21,16 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { signIn, googleSignIn } = useAuth();
 
+
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     try {
-      await signIn(email, password);
+      const userCredential = await signIn(email, password);
+      const user = userCredential.user;
+      await updateDoc(doc(firestore, "drivers", user.uid), {
+        status: "Online",
+        lastLoggedIn: new Date(),
+      });
       setError("Logged in successfully!");
       navigate("/profile");
     } catch (error) {
@@ -32,7 +40,12 @@ const LoginPage = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      await googleSignIn();
+     const userCredential = await googleSignIn();
+      const user = userCredential.user;
+      await updateDoc(doc(firestore, "drivers", user.uid), {
+        status: "Online",
+        lastLoggedIn: new Date(),
+      });
       toast.success("Logged in with Google!");
       navigate("/profile");
     } catch (error) {
