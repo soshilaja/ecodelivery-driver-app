@@ -9,10 +9,7 @@ import {
   LockClosedIcon,
 } from "@heroicons/react/24/solid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faGoogle,
-  
-} from "@fortawesome/free-brands-svg-icons";
+import {faGoogle} from "@fortawesome/free-brands-svg-icons";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");

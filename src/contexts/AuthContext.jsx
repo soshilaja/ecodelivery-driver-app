@@ -7,6 +7,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, firestore, googleProvider } from "../services/firebase";
+import PropTypes from "prop-types";
 
 const AuthContext = createContext();
 
@@ -104,3 +105,7 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+AuthProvider.propTypes = {
+  children: PropTypes.node,
+};
